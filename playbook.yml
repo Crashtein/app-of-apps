@@ -1,0 +1,45 @@
+---
+- name: Install requirements and run docker-compose with frontend and backend applications
+  hosts: all
+  become: true
+  vars:
+    deployment_path: "/home/ubuntu/app"
+    compose_path: "./docker-compose.yml"
+    env_path: "./.env"
+  roles:
+  - geerlingguy.docker
+  tasks:
+  - name: apt update
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+  - name: install python3-pip
+    package:
+      name:
+      - python3-pip
+      state: present
+
+  - name: instalacja docker
+    pip:
+      name:
+      - docker<7.0
+      - docker-compose
+  - name: Create destination directory
+    file:
+      path: "{{ deployment_path }}"
+      state: directory
+  - name: Copy docker-compose.yml to destination_path
+    copy:
+      src: "{{ compose_path }}"
+      dest: "{{ deployment_path }}"
+  - name: Copy .env file to destination_path
+    copy:
+      src: "{{ env_path }}"
+      dest: "{{ deployment_path }}"
+  - name: Run docker-compose up
+    docker_compose:
+      project_src: "{{ deployment_path }}"
+      build: yes
+      debug: yes
+### moved to .env file
+#    environment:
+#      FRONTEND_IMAGE: "{{ lookup('env','FRONTEND_IMAGE') }}"
+#      BACKEND_IMAGE: "{{ lookup('env','BACKEND_IMAGE') }}"
