@@ -51,7 +51,7 @@ pipeline {
         }
     }
     post {
-        alwyas {
+        always {
             sh "docker-compose down"
             cleanWs()
         }
