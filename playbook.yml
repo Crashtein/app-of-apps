@@ -30,16 +30,16 @@
     copy:
       src: "{{ compose_path }}"
       dest: "{{ deployment_path }}"
-  - name: Copy .env file to destination_path
-    copy:
-      src: "{{ env_path }}"
-      dest: "{{ deployment_path }}"
+#  - name: Copy .env file to destination_path
+#    copy:
+#      src: "{{ env_path }}"
+#      dest: "{{ deployment_path }}"
   - name: Run docker-compose up
     docker_compose:
       project_src: "{{ deployment_path }}"
       build: yes
       debug: yes
 ### moved to .env file
-#    environment:
-#      FRONTEND_IMAGE: "{{ lookup('env','FRONTEND_IMAGE') }}"
-#      BACKEND_IMAGE: "{{ lookup('env','BACKEND_IMAGE') }}"
+    environment:
+      FRONTEND_IMAGE: "{{ lookup('env','FRONTEND_IMAGE') }}"
+      BACKEND_IMAGE: "{{ lookup('env','BACKEND_IMAGE') }}"
