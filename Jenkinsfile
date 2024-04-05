@@ -64,6 +64,18 @@ pipeline {
                 }
             }
         }
+        stage('Run terraform') {
+            steps {
+                dir('Terraform') {                
+                    git branch: 'main', url: 'https://github.com/crashtein/terraform'
+                    withAWS(credentials:'AWS', region: 'us-east-1') {
+                            sh 'terraform init -backend-config=bucket=bucket-pk01'
+                            sh 'terraform apply -auto-approve -var bucket_name=bucket-pk01'
+                            
+                    } 
+                }
+            }
+        }
     }
     post {
         always {
