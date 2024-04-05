@@ -12,6 +12,9 @@ pipeline {
         string(name: 'backendDockerTag', defaultValue: '', description: 'Backend docker image tag')
         string(name: 'frontendDockerTag', defaultValue: '', description: 'Frontend docker image tag')
     }
+    tools {
+	terraform 'Terraform'
+    }
     stages {
         stage('Get code') {
             steps {
@@ -47,6 +50,18 @@ pipeline {
             steps {
                 sh "pip3 install -r test/selenium/requirements.txt"
                 sh "python3 -m pytest test/selenium/seleniumFrontend.py"
+            }
+        }
+        stage('Run Ansible') {
+               steps {
+                   script {
+                        sh "pip3 install -r requirements.txt"
+                        sh "ansible-galaxy install -r requirements.yml"
+                        withEnv(["FRONTEND_IMAGE=$frontendImage:$frontendDockerTag", 
+                                 "BACKEND_IMAGE=$backendImage:$backendDockerTag"]) {
+                            ansiblePlaybook inventory: 'inventory', playbook: 'playbook.yml'
+                        }
+                }
             }
         }
     }
